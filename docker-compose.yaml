@@ -9,5 +9,5 @@ services:
       - ./config/otel-collector-config-${NETWORK:-mocha}.yaml:/etc/otel-collector-config.yaml
     ports:
       - ${OTEL_GRPC_PORT:-4317}:${OTEL_GRPC_PORT:-4317}
-      - ${OTEL_HTTP_PORT:-4317}:${OTEL_HTTP_PORT:-4318}
+      - ${OTEL_HTTP_PORT:-4318}:${OTEL_HTTP_PORT:-4318}
       - ${OTEL_PROMETHEUS_EXPORTER:-8889}:${OTEL_PROMETHEUS_EXPORTER:-8888}
