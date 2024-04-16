@@ -16,7 +16,7 @@ After=network.target
 User=<your-user>
 Group=<your-user>
 Type=simple
-ExecStart=/home/<your-user>/celestia-bridge-exporter --listen.port 8380 --endpoint http://localhost:26658 --p2p.network mocha
+ExecStart=/home/<your-user>/go/bin/celestia-bridge-exporter --listen.port 8380 --endpoint http://localhost:26658 --p2p.network mocha
 
 [Install]
 WantedBy=multi-user.target
