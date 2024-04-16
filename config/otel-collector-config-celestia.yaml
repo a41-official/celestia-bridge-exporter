@@ -7,7 +7,7 @@ exporters:
   otlphttp:
     endpoint: https://otel.celestia.observer
   prometheus:
-    endpoint: "0.0.0.0:8888"
+    endpoint: "0.0.0.0:8889"
     namespace: celestia
     send_timestamps: true
     metric_expiration: 180m
