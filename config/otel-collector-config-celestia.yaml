@@ -3,18 +3,11 @@ receivers:
     protocols:
       grpc: 
       http:
-  prometheus:
-    config:
-      scrape_configs:
-      - job_name: 'otel-collector'
-        scrape_interval: 10s
-        static_configs:
-        - targets: ['127.0.0.1:8888']
 exporters:
   otlphttp:
     endpoint: https://otel.celestia.observer
   prometheus:
-    endpoint: "0.0.0.0:OTEL_PROMETHEUS_EXPORTER"
+    endpoint: "0.0.0.0:8888"
     namespace: celestia
     send_timestamps: true
     metric_expiration: 180m
