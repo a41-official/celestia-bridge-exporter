@@ -1,4 +1,4 @@
-module celbridge-exporter
+module celestia-bridge-exporter
 
 go 1.19
 

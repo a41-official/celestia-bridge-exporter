@@ -10,16 +10,16 @@ go build .
 ```
 [Unit]
 Description=Celestia Bridge Exporter  
-After=network.target  
-  
-[Service]  
-User=<your-user> 
+After=network.target
+
+[Service]
+User=<your-user>
 Group=<your-user>
-Type=simple  
-ExecStart=/home/<your-user>/celbridge-exporter --listen.port 8380 --endpoint http://localhost:26658 --p2p.network mocha
-  
-[Install]  
-WantedBy=multi-user.target  
+Type=simple
+ExecStart=/home/<your-user>/celestia-bridge-exporter --listen.port 8380 --endpoint http://localhost:26658 --p2p.network mocha
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 ## Forked from
