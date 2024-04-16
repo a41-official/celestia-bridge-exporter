@@ -1,21 +1,23 @@
-# celestia-node-exporter
-otel collector with prometheus exporter
+# celestia-bridge-exporter
+celestia bridge node exporter
 
-## Usage
-
-### Add metric params to init command
+## Build
 ```
-celestia bridge start <Other Params> --metrics --metrics.tls=false
+go build .
 ```
 
-### celestia mainnet
+## Systemd config
 ```
-cp .env.celestia .env
-docker compose up -d
-```
-
-### mocha testnet
-```
-cp .env.mocha .env
-docker compose up -d
+[Unit]
+Description=Celestia Bridge Exporter  
+After=network.target  
+  
+[Service]  
+User=<your-user> 
+Group=<your-user>
+Type=simple  
+ExecStart=/home/<your-user>/celbridge-exporter --listen.port 8380 --endpoint http://localhost:26658 --p2p.network mocha
+  
+[Install]  
+WantedBy=multi-user.target  
 ```
