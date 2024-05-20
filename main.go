@@ -17,25 +17,9 @@ import (
 )
 
 var (
-	ConstLabels map[string]string
-
-	localHeight = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name:        "bridge_local_height",
-		Help:        "Local height of the Celestia node",
-		ConstLabels: ConstLabels,
-	})
-
-	networkHeight = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name:        "bridge_network_height",
-		Help:        "Network height of the Celestia node",
-		ConstLabels: ConstLabels,
-	})
+	localHeightGauge   prometheus.Gauge
+	networkHeightGauge prometheus.Gauge
 )
-
-func init() {
-	prometheus.MustRegister(localHeight)
-	prometheus.MustRegister(networkHeight)
-}
 
 func main() {
 	listenPort := flag.String("listen.port", "8380", "port to listen on")
@@ -50,7 +34,8 @@ func main() {
 		authToken := getAuthToken(*p2pNetwork)
 
 		_, chainId := getHeight(client, authToken, "header.NetworkHead", *endpoint)
-		setChainId(chainId)
+
+		setHeightHandler(chainId)
 
 		for {
 			updateMetrics(client, authToken, *endpoint)
@@ -69,8 +54,8 @@ func updateMetrics(client *http.Client, authToken, endpoint string) {
 		return
 	}
 
-	localHeight.Set(float64(local))
-	networkHeight.Set(float64(network))
+	localHeightGauge.Set(float64(local))
+	networkHeightGauge.Set(float64(network))
 
 }
 
@@ -128,8 +113,24 @@ func getAuthToken(p2pNetwork string) string {
 	return strings.TrimSpace(string(out))
 }
 
-func setChainId(chainId string) {
-	ConstLabels = map[string]string{
+func setHeightHandler(chainId string) {
+	ConstLabels := map[string]string{
 		"chain_id": chainId,
 	}
+
+	localHeightGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "bridge_local_height",
+		Help:        "Local height of the Celestia node",
+		ConstLabels: ConstLabels,
+	})
+
+	networkHeightGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "bridge_network_height",
+		Help:        "Network height of the Celestia node",
+		ConstLabels: ConstLabels,
+	})
+
+	registry := prometheus.NewRegistry()
+	registry.MustRegister(localHeightGauge)
+	registry.MustRegister(networkHeightGauge)
 }
