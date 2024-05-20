@@ -48,6 +48,10 @@ func main() {
 	go func() {
 		client := &http.Client{}
 		authToken := getAuthToken(*p2pNetwork)
+
+		_, chainId := getHeight(client, authToken, "header.NetworkHead", *endpoint)
+		setChainId(chainId)
+
 		for {
 			updateMetrics(client, authToken, *endpoint)
 			time.Sleep(5 * time.Second)
@@ -71,13 +75,13 @@ func updateMetrics(client *http.Client, authToken, endpoint string) {
 }
 
 func getHeights(client *http.Client, authToken, endpoint string) (int, int, error) {
-	local := getHeight(client, authToken, "header.LocalHead", endpoint)
-	network := getHeight(client, authToken, "header.NetworkHead", endpoint)
+	local, _ := getHeight(client, authToken, "header.LocalHead", endpoint)
+	network, _ := getHeight(client, authToken, "header.NetworkHead", endpoint)
 
 	return local, network, nil
 }
 
-func getHeight(client *http.Client, authToken, method, endpoint string) int {
+func getHeight(client *http.Client, authToken, method, endpoint string) (int, string) {
 	reqData := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      1,
@@ -92,7 +96,7 @@ func getHeight(client *http.Client, authToken, method, endpoint string) int {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return 0
+		return 0, ""
 	}
 	defer resp.Body.Close()
 
@@ -106,13 +110,12 @@ func getHeight(client *http.Client, authToken, method, endpoint string) int {
 	height, err := strconv.Atoi(heightStr)
 	if err != nil {
 		fmt.Printf("Error converting height to int: %v\n", err)
-		return 0
+		return 0, ""
 	}
 
 	chainIdStr := header.(map[string]interface{})["chain_id"].(string)
-	setChainId(chainIdStr)
 
-	return height
+	return height, chainIdStr
 }
 
 func getAuthToken(p2pNetwork string) string {
