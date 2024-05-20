@@ -17,14 +17,18 @@ import (
 )
 
 var (
+	ConstLabels map[string]string
+
 	localHeight = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "bridge_local_height",
-		Help: "Local height of the Celestia node",
+		Name:        "bridge_local_height",
+		Help:        "Local height of the Celestia node",
+		ConstLabels: ConstLabels,
 	})
 
 	networkHeight = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "bridge_network_height",
-		Help: "Network height of the Celestia node",
+		Name:        "bridge_network_height",
+		Help:        "Network height of the Celestia node",
+		ConstLabels: ConstLabels,
 	})
 )
 
@@ -96,12 +100,18 @@ func getHeight(client *http.Client, authToken, method, endpoint string) int {
 	var respData map[string]interface{}
 	json.Unmarshal(respBytes, &respData)
 
-	heightStr := respData["result"].(map[string]interface{})["header"].(map[string]interface{})["height"].(string)
+	header := respData["result"].(map[string]interface{})["header"]
+
+	heightStr := header.(map[string]interface{})["height"].(string)
 	height, err := strconv.Atoi(heightStr)
 	if err != nil {
 		fmt.Printf("Error converting height to int: %v\n", err)
 		return 0
 	}
+
+	chainIdStr := header.(map[string]interface{})["chain_id"].(string)
+	setChainId(chainIdStr)
+
 	return height
 }
 
@@ -113,4 +123,10 @@ func getAuthToken(p2pNetwork string) string {
 	}
 
 	return strings.TrimSpace(string(out))
+}
+
+func setChainId(chainId string) {
+	ConstLabels = map[string]string{
+		"chain_id": chainId,
+	}
 }
