@@ -130,7 +130,6 @@ func setHeightHandler(chainId string) {
 		ConstLabels: ConstLabels,
 	})
 
-	registry := prometheus.NewRegistry()
-	registry.MustRegister(localHeightGauge)
-	registry.MustRegister(networkHeightGauge)
+	prometheus.MustRegister(localHeightGauge)
+	prometheus.MustRegister(networkHeightGauge)
 }
